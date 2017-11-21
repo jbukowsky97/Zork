@@ -1,12 +1,12 @@
 import random
 
 from monsters import Monster, Person, Zombie, Vampire, Ghoul, Werewolve
-from observe import Observer
+from observe import Observer, Observable
 
 #######################################################
 # home class
 #######################################################
-class Home(Observer):
+class Home(Observer, Observable):
     
     #######################################################
     # constructor to initialize variables
@@ -15,6 +15,7 @@ class Home(Observer):
     #######################################################
     def __init__(self):
         #list of 0-10 monsters
+        Observable.__init__(self)
         self._monsters = []
         monster_types = "PZVGW"
         for i in range(0, 10):
@@ -44,6 +45,7 @@ class Home(Observer):
         observable.remove_observer(self)
         self._monsters.remove(observable)
         self._monsters.append(Person())
+        self.notify_observers("died")
 
     #######################################################
     # returns monsters list

@@ -12,14 +12,16 @@ class Neighborhood:
     # @param rows number of rows in neighborhood
     # @param cols number of cols in neighborhood
     #######################################################
-    def __init__(self, rows, cols):
+    def __init__(self, game, rows, cols):
         self._homes = []
         self._rows = rows
         self._cols = cols
         for row in range(0, rows):
             self._homes.append([])
             for col in range(0, cols):
-                self._homes[row].append(Home())
+                home = Home()
+                home.add_observer(game)
+                self._homes[row].append(home)
 
     #######################################################
     # returns number of rows

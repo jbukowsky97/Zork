@@ -42,16 +42,6 @@ class Weapon(Observable):
             self.notify_observers("out_of_uses")
 
     #######################################################
-    # returns weapon to string
-    #
-    # @param self current object
-    #
-    # @return string weapon to string
-    #######################################################
-    def to_string(self):
-        return self._name + "\t\t\t" + str(self._uses)
-
-    #######################################################
     # returns weapon name
     #
     # @param self current object

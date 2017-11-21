@@ -5,12 +5,13 @@ from home import Home
 from monsters import *
 from weapons import *
 from player import Player
+from observe import Observer
 
 #######################################################
 # class that creates and manages a Game object
 #######################################################
 
-class Game:
+class Game(Observer):
 
     #######################################################
     # constructor to initialize variables
@@ -19,8 +20,13 @@ class Game:
     #######################################################
     def __init__(self):
         self._player = Player(0, 0)
-        self._neighborhood = Neighborhood(5, 5)
+        self._neighborhood = Neighborhood(self, 5, 5)
         self._game_active = True
+        temp_people = 0
+        for row in range(0, self._neighborhood.get_rows()):
+            for col in range(0, self._neighborhood.get_cols()):
+                temp_people += self._neighborhood.get_home(row, col).get_people()
+        self._monsters = 250 - temp_people
         print("You wake up on Halloween and discover that the world")
         print("is not how you left it. Batches of bad candy have transformed")
         print("your friends and neighbors into all sorts of crazy monsters.")
@@ -58,6 +64,9 @@ class Game:
                     break
             else:
                 self.game_unknown()
+            if self._monsters <= 0:
+                print("You successfully all of the monsters back into people, congrats!")
+                break
 
     #######################################################
     # sub-function to handle user entering move command
@@ -169,14 +178,27 @@ class Game:
     #######################################################
     def game_stats(self):
         print("\n")
+        print("monsters remaining:\t%d" % self._monsters)
+        print()
         print("player:")
         print("\thp:\t\t\t\t" + str(self._player.get_hp()))
         print("\tattack:\t\t\t\t" + str(self._player.get_atk()))
         print("inventory:")
-        print("\tweapon\t\t\t\tuses")
+        print("\tweapon\t\t\t\tatk_modifier\t\t\tuses")
         print()
         for weapon in self._player.get_weapons():
-            print("\t" + weapon.to_string())
+            if type(weapon) is HersheyKiss:
+                print("\t" + weapon.get_name() + "\t\t\t" + str(weapon.get_attack_modifier()) + "\t\t\t\t" + str(weapon.get_uses()))
+            else:
+                print("\t" + weapon.get_name() + "\t\t\t" + str(weapon.get_attack_modifier()) + "\t\t" + str(weapon.get_uses()))
+        print()
+        print("monsters in current house:")
+        print("\ttype\t\t\thealth")
+        for monster in self._neighborhood.get_home(self._player.get_row(), self._player.get_col()).get_monsters():
+            if monster.get_type() == "werewolve":
+                 print("\t" + monster.get_type() + "\t\t" + str(monster.get_hp()))
+            else:
+                print("\t" + monster.get_type() + "\t\t\t" + str(monster.get_hp()))
         print("\n")
 
     #######################################################
@@ -219,6 +241,16 @@ class Game:
         print("\n")
         print("unknown command")
         print("\n")
+    
+    #######################################################
+    # process update from observable
+    #
+    # @param self current object
+    # @param observable object calling update
+    # @param msg message object is sending
+    #######################################################
+    def update(self, observable, msg):
+        self._monsters -= 1
 
 #######################################################
 # function to create and run a game object when ran
